@@ -36,7 +36,7 @@ GameDashboard/
 └── README.md
 ```
 
-🚀 使用方法
+## 🚀 使用方法
 1. 引用包（推荐方式）
 ```Bash
 # 在你的项目中执行
@@ -70,7 +70,7 @@ app.Run();
 密码：123
 
 
-📦 打包发布
+## 📦 打包发布
 
 ```Bash
 dotnet pack src/GameDashboard.Core -c Release -o ./nupkg
