@@ -1,7 +1,9 @@
 ﻿using GameDashboard.Core.Models;
-using Microsoft.AspNetCore.Builder;        // IApplicationBuilder 等
-using Microsoft.AspNetCore.Http;           // IResult、Results
-using Microsoft.AspNetCore.Routing;        // ← 这里！IEndpointRouteBuilder
+using GameDashboard.Core.Services;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Routing;
 
 namespace GameDashboard.Core.Endpoints;
 
@@ -10,7 +12,7 @@ public static class DashboardEndpoints
     public static IEndpointRouteBuilder MapDashboardEndpoints(this IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("/api/dashboard")
-                       .RequireAuthorization(); // 需要登录授权才能访问
+                       .RequireAuthorization();
 
         group.MapGet("/player/{roleId}", GetPlayer);
         group.MapPost("/recharge", Recharge);
@@ -20,21 +22,21 @@ public static class DashboardEndpoints
         return app;
     }
 
-    private static IResult GetPlayer(string roleId)
+    private static async Task<IResult> GetPlayer(string roleId, [FromServices] IGameService service)
     {
-        var player = new PlayerInfo(roleId, "测试角色", 88, 9999999, 88888, 10);
-        return Results.Ok(player);
+        var player = await service.GetPlayerAsync(roleId);
+        return player != null ? Results.Ok(player) : Results.NotFound("角色不存在");
     }
 
-    private static IResult Recharge(RechargeRequest req)
+    private static async Task<IResult> Recharge([FromBody] RechargeRequest req, [FromServices] IGameService service)
     {
-        Console.WriteLine($"【充值】{req.RoleId} {req.CurrencyType} x {req.Amount}");
+        await service.RechargeAsync(req);
         return Results.Ok(new { success = true, message = "充值成功" });
     }
 
-    private static IResult SendMail(SendMailRequest req)
+    private static async Task<IResult> SendMail([FromBody] SendMailRequest req, [FromServices] IGameService service)
     {
-        Console.WriteLine($"【发邮件】{req.RoleId} {req.Title}");
+        await service.SendMailAsync(req);
         return Results.Ok(new { success = true, message = "邮件已发送" });
     }
 
