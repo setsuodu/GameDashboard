@@ -1,6 +1,7 @@
 ﻿using GameDashboard.Core.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Logging;
 
 namespace GameDashboard.UI.Pages.Player;
 
@@ -11,12 +12,17 @@ public class SearchModel : PageModel
 
     public PlayerInfo? Player { get; set; }
 
-    public async Task OnPostAsync()
+    public void OnGet() { }
+
+    public IActionResult OnPost()
     {
-        if (!string.IsNullOrEmpty(RoleId))
+        Console.WriteLine($"【OnPost】收到 RoleId = '{RoleId}'");   // 用 Console 更明显
+
+        if (!string.IsNullOrWhiteSpace(RoleId))
         {
-            // 后面改成调用 API
-            Player = new PlayerInfo(RoleId, "测试角色", 88, 9999999, 88888, 10);
+            Player = new PlayerInfo(RoleId, $"测试角色_{RoleId}", 88, 9999999, 88888, 10);
         }
+
+        return Page();
     }
 }

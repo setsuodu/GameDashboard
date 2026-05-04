@@ -5,10 +5,9 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 注册 Dashboard
 builder.Services.AddGameDashboard();
+builder.Services.AddRazorPages();           // 必须
 
-// 简单 Cookie 登录（测试用）
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
@@ -18,35 +17,27 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 
 var app = builder.Build();
 
-// 中间件
 app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-// ==================== 你的 Dashboard API ====================
+// ==================== 核心映射 ====================
 app.MapDashboardEndpoints();
+app.MapRazorPages();                        // 必须
 
-// ==================== 临时页面 ====================
-app.MapGet("/", () => Results.Redirect("/login"));
-
-// ==================== 登录处理 ====================
-// GET 登录页
+// ==================== 登录 ====================
 app.MapGet("/login", () => Results.Content("""
     <!DOCTYPE html>
     <html>
-    <head>
-        <meta charset="utf-8">
-        <title>GameDashboard 登录</title>
-        <style>
-            body { font-family: Arial, sans-serif; background: #f4f4f4; margin: 50px; }
-            .login-box { max-width: 360px; margin: 100px auto; padding: 30px; background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-            input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 4px; }
-            button { width: 100%; padding: 12px; background: #007bff; color: white; border: none; border-radius: 4px; font-size: 16px; }
-        </style>
+    <head><meta charset="utf-8"><title>登录</title>
+    <style>body{font-family:Arial;background:#f4f4f4;margin:40px;}
+    .box{max-width:400px;margin:100px auto;padding:30px;background:white;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.1);}
+    input{width:100%;padding:10px;margin:8px 0;border:1px solid #ccc;border-radius:4px;}
+    button{width:100%;padding:12px;background:#007bff;color:white;border:none;border-radius:4px;}</style>
     </head>
     <body>
-        <div class="login-box">
+        <div class="box">
             <h2>🎮 GameDashboard GM后台</h2>
             <form action="/login" method="post">
                 <p>用户名: <input name="username" value="admin" /></p>
@@ -58,12 +49,11 @@ app.MapGet("/login", () => Results.Content("""
     </html>
 """, "text/html; charset=utf-8")).DisableAntiforgery();
 
-// POST 登录处理
 app.MapPost("/login", async (HttpContext ctx) =>
 {
     var form = await ctx.Request.ReadFormAsync();
-    var username = form["username"].ToString();
-    var password = form["password"].ToString();
+    string username = form["username"];
+    string password = form["password"];
 
     if (username == "admin" && password == "123")
     {
@@ -72,10 +62,12 @@ app.MapPost("/login", async (HttpContext ctx) =>
         var principal = new System.Security.Claims.ClaimsPrincipal(identity);
 
         await ctx.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
-        return Results.Redirect("/");
+        return Results.Redirect("/Index");   // 登录后跳 Index
     }
-
     return Results.BadRequest("账号或密码错误");
 }).DisableAntiforgery();
+
+// 未登录访问根目录也跳登录
+app.MapGet("/", () => Results.Redirect("/login")).AllowAnonymous();
 
 app.Run();

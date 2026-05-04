@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\GameDashboard.Core\GameDashboard.Core.csproj" />
+    <ProjectReference Include="..\..\src\GameDashboard.UI\GameDashboard.UI.csproj" />
   </ItemGroup>
 
   <PropertyGroup>
