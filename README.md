@@ -77,16 +77,15 @@ dotnet pack src/GameDashboard.Core -c Release -o ./nupkg
 dotnet pack src/GameDashboard.UI -c Release -o ./nupkg
 ```
 
-接下来的工作（迭代计划）
-短期（1-2 天）
+## 🔄 迭代计划
 
+短期（1-2 天）
 - [ ] 完善充值和邮件页面
 - [ ] 增加纯 HTML + JS 版本（供你快速修改）
 - [ ] 写 GitHub Actions 自动打包发布
 - [ ] 提供本地测试引用示例
 
 中期
-
 - [ ] 支持多区服切换
 - [ ] 操作审计日志
 - [ ] CDK 兑换码管理
@@ -94,7 +93,6 @@ dotnet pack src/GameDashboard.UI -c Release -o ./nupkg
 - [ ] 纯静态前端版本（Vite + Vue3 可选）
 
 长期
-
 - [ ] 发布到 nuget.org
 - [ ] 文档站点 + 在线 Demo
 - [ ] 支持 Blazor / HTMX 等多种 UI 方案
